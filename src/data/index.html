@@ -1,0 +1,394 @@
+<!--==================================================================================================================================================
+# Name           : index.html
+# Author         : Mr. Mohamed Ali Haoufa
+# Created on     : May 15, 2021
+# Description    : This program is an HTML file which develops the ESP32 web server interface for the Automatic Wireless Mini Weather Station Project.
+======================================================================================================================================================-->
+
+<!DOCTYPE html>
+<html>
+    <head>
+      
+      <title>ESP32 IOT DASHBOARD</title>
+      <!-- The following <meta> tag makes the web page responsive in any browser: -->
+      <meta name="viewport" content="width=device-width, initial-scale=1"> 
+
+      <!-- The <link> tag is needed to load the icons from the fontawesome website : -->
+      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+      <link rel="icon" type="image/png" href="favicon.png">
+      <link rel="stylesheet" type="text/css" href="style.css">
+      
+      <!-- Include the highcharts library : -->
+      <script src="https://code.highcharts.com/highcharts.js"></script>  
+      
+      <style> 
+      
+          html {
+            /* Setting up the HTML page to display the text with Arial font in block without margin, and aligned at the center : */
+            font-family: Arial, Helvetica, sans-serif;
+            display: inline-block;
+            text-align: center;
+          }
+
+          /* Setting up the font size for the Heading (h1), Paragraph (p), the Units(.units) and the Cards (.card-grid) of the readings : */
+          h1 {
+            font-size: 1.8rem;
+            color: white;
+          }
+          p {
+            font-size: 1.4rem;
+          }
+          .units { font-size: 1.2rem; }
+
+          .topnav {
+            overflow: hidden;
+            background-color: #0A1128;
+            color: white; font-size: 1rem;
+          }
+          body {
+            margin: 5;
+
+          }
+          .content {
+            padding: 5%;
+          }
+          .card-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+              padding: 5%;
+
+            display: grid;
+            grid-gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(800px, 1fr));
+          }
+          .card-grid2 {
+            max-width: 1200px;
+            margin: 0 auto;
+              padding: 0%;
+
+            display: grid;
+            grid-gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(800px, 1fr));
+          }
+          .card {
+            background-color: white;
+            box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+          }
+          .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #034078
+          }
+
+          .cards { max-width: 1000px; margin: 0 auto; display: grid; grid-gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); }
+          .cards2 { max-width: 1000px; margin: 0 auto; display: grid; grid-gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+          .chart-container {
+            padding-right: 5%;
+            padding-left: 5%;
+          }
+          .BME280-labels{
+                /* The style of the labels for the readings : */
+                font-size: 1.4rem;
+                vertical-align:middle;
+                padding-bottom: 15px;
+
+              }
+      </style>
+    </head>
+
+    <!-- Note : All of the previous tags should go between the <head> and </head> tags...
+        These tags are used to include content that is not directly visible to the user, like the <meta> , the <link> tags, and the styles. -->
+
+
+    <!-- Inside the <body></body> tags is where we add the web page content : -->
+    <body onload=display_ct();>
+
+        <div class="topnav">
+          <!-- The <h1></h1> tags add a heading to the web page : -->
+          <h1>ESP32 WEB SERVER Interface "Automatic Wireless Mini Weather Station"  </h1> 
+        </div>
+        
+        <div class="content">
+          <div class="cards">    <!-- to put the cards beside each other with the cards class. -->
+
+              <!-- We can display all the paragraphs( time, temperature ,humidity, date ) by using the <p> and </p> tags: -->
+              <div class="card">    <!-- To make the content in a card with the card class. -->
+                  <p><i class="fas fa-clock" style="color:#00add6;"></i>  <span class="BME280-labels">Time</span> </p> <p><span id="time" ></span></p>
+              </div>
+                
+              <div class="card">
+                  <p> <i class="fas fa-thermometer-half" style="color:#059e8a;"></i> <span class="BME280-labels">Temperature</span> </p>
+                  <p><span id="temperature"  >%TEMPERATURE%</span><sup class="units" >&deg;C</sup></p>
+                  <!-- %TEMPERATURE% means as a variable placeholder that will be replaced by the actual temperature value from the BME280 sensor. -->
+              </div>
+            
+              <div class="card">
+                <p><i class="fas fa-tint" style="color:#00add6;"></i> <span class="BME280-labels" >Humidity</span></p> 
+                <p><span id="humidity" >%HUMIDITY%</span><sup class="units">&percnt;</sup></p>
+              </div>
+
+              <div class="card">
+                <p><svg xmlns="http://www.w3.org/2000/svg"  width="25" height="25" viewBox="0 0 512 512"><path d="M512 256C512 397.4
+                  397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256zM256 64C238.3 64 224 78.33 224 96C224 113.7 238.3 
+                  128 256 128C273.7 128 288 113.7 288 96C288 78.33 273.7 64 256 64zM256 416C291.3 416 320 387.3 320 352C320 334.6 313.1 318.9 301.9 307.4L365.1
+                   161.7C371.3 149.5 365.8 135.4 353.7 130C341.5 124.7 327.4 130.2 322 142.3L257.9 288C257.3 288 256.6 287.1 256 287.1C220.7 287.1 192 316.7 
+                   192 352C192 387.3 220.7 416 256 416V416zM144 112C126.3 112 112 126.3 112 144C112 161.7 126.3 176 144 176C161.7 176 176 161.7 176 144C176 
+                   126.3 161.7 112 144 112zM96 288C113.7 288 128 273.7 128 256C128 238.3 113.7 224 96 224C78.33 224 64 238.3 64 256C64 273.7 78.33 288 96 
+                   288zM416 224C398.3 224 384 238.3 384 256C384 273.7 398.3 288 416 288C433.7 288 448 273.7 448 256C448 238.3 433.7 224 416 224z" fill="#00add6"/></svg><span class="BME280-labels" > Pressure</span></p> 
+                <p><span id="pressure" >%PRESSURE%</span><sup class="units">Pa</sup></p>
+              </div>
+
+              <div class="card">
+                  <p><i class="fas fa-calendar-day"  style="color:#00add6;"></i> <span class="BME280-labels">Date</span> </p> <p> <span id="date" ></span></p> 
+              </div>
+          </div>
+
+          <!-- We create a <div> section for each graphic with a unique id ( chart-temperature, chart-humidity ): -->
+          <div class="cards">
+
+              <div class="card-grid">
+                  <div class="card">
+                      <p class="card-title">Temperature chart</p>
+                      <div id="chart-temperature" class="chart-container"></div>
+                  </div>
+              
+              <div class="card-grid2">
+                  <div class="card">
+                      <p class="card-title"> Humidity Chart</p>
+                      <div id="chart-humidity" class="chart-container"></div>
+                  </div>
+
+              <div class="card-grid2">
+                  <div class="card">
+                      <p class="card-title"> Pressure Chart</p>
+                      <div id="chart-pressure" class="chart-container"></div>
+                  </div>
+
+              </div>
+
+          </div>
+        </div>
+        <script src="script.js"></script>
+    </body>
+  
+  <script>
+
+  // display_c() function specifically to determine our time zone and date as well :
+  function display_c(){
+  var refresh=100;    // Refresh rate in milli seconds
+  mytime=setTimeout('display_ct()',refresh)
+  }
+
+  function display_ct(){
+  var x = new Date()
+
+  var today = new Date();
+
+  var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+
+  var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+
+  document.getElementById('date').innerHTML = date;
+  document.getElementById('time').innerHTML = time;
+
+  display_c();
+  }
+  
+  //To create a new chart, we use the new Highcharts.Chart() method and pass as argument the chart properties.
+  var chartT = new Highcharts.Chart({
+    chart:{ renderTo : 'chart-temperature' },   // Defining where we want to place the chart by placing it in the HTML element with the chart-temperature id.
+    title: { text: 'BME280 Temperature' },
+  series: [
+      { //Define the options for the series :
+        name: 'Temperature #1',   // Defines the series name
+        type: 'line',             // Defines the type of chart
+        color: '#101D42',         // The color of the line
+        marker: {
+          symbol: 'circle',
+          radius: 5,              // The size of the marker
+          fillColor: '#101D42',
+        }
+      }, ],
+      title: {
+      text: undefined             // We’ve already defined a title for the chart in a heading of the HTML file, we will not set the title here.
+    },
+    xAxis: {
+      type: 'datetime',
+      dateTimeLabelFormats: { second: '%H:%M:%S' }    // This is the axis where we’ll display data and time
+    },
+    yAxis: {
+      title: {
+        text: 'Temperature Celsius Degrees'           // The title for the y axis
+      }
+    },
+    credits: {
+      enabled: false                                  // Set the credits option to false to hide the credits of the Highcharts library.
+    }
+  });
+
+  /* Then, the setInvertal() function adds points to the charts,...
+    Every 1 seconds it makes a request to the /temperature URL to get the temperature readings from our ESP32 */
+  setInterval(function ( ) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var x = (new Date()).getTime(),
+            y = parseFloat(this.responseText);
+        //console.log(this.responseText);
+        if(chartT.series[0].data.length > 150) {
+          chartT.series[0].addPoint([x, y], true, true, true);
+        } else {
+          chartT.series[0].addPoint([x, y], true, false, true);
+        }
+      }
+    };
+    xhttp.open("GET", "/temperature", true);
+    xhttp.send();
+  }, 1000 ) ;
+
+  var chartH = new Highcharts.Chart({
+    chart:{ renderTo:'chart-humidity' },
+    title: { text: 'BME280 Humidity' },
+    series: [{
+        name: 'humidity #2',
+        type: 'line',
+        color: '#00A6A6',
+        marker: {
+          symbol: 'square',
+          radius: 5,
+          fillColor: '#00A6A6',
+        }
+      },
+      
+    ],
+    title: {
+      text: undefined
+    },
+    xAxis: {
+      type: 'datetime',
+      dateTimeLabelFormats: { second: '%H:%M:%S' }
+    },
+    yAxis: {
+      title: {
+        text: ' humidity percent'
+      }
+    },
+    credits: {
+      enabled: false
+    }
+  });
+  setInterval(function ( ) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var x = (new Date()).getTime(),                           // The x value for the chart is the timestamp.
+            y = parseFloat(this.responseText);
+        //console.log(this.responseText);
+        if(chartH.series[0].data.length > 150) {
+          chartH.series[0].addPoint([x, y], true, true, true);    // If the series has more than 150 points: append and shift a new point;
+        } else {
+          chartH.series[0].addPoint([x, y], true, false, true);   // If the series has less than 150 points: append a new point.
+        }
+      }
+    };
+    xhttp.open("GET", "/humidity", true);
+    xhttp.send();
+  }, 1000 ) ;
+
+  var chartP = new Highcharts.Chart({
+    chart:{ renderTo:'chart-pressure' },
+    title: { text: 'BME280 Pressure' },
+    series: [{
+        name: 'pressure #3',
+        type: 'line',
+        color: '#990000',
+        marker: {
+          symbol: 'square',
+          radius: 5,
+          fillColor: '#990000',
+        }
+      },
+      
+    ],
+    title: {
+      text: undefined
+    },
+    xAxis: {
+      type: 'datetime',
+      dateTimeLabelFormats: { second: '%H:%M:%S' }
+    },
+    yAxis: {
+      title: {
+        text: ' pressure pascal '
+      }
+    },
+    credits: {
+      enabled: false
+    }
+  });
+  setInterval(function ( ) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var x = (new Date()).getTime(),                           // The x value for the chart is the timestamp.
+            y = parseFloat(this.responseText);
+        //console.log(this.responseText);
+        if(chartP.series[0].data.length > 150) {
+          chartP.series[0].addPoint([x, y], true, true, true);    // If the series has more than 150 points: append and shift a new point;
+        } else {
+          chartP.series[0].addPoint([x, y], true, false, true);   // If the series has less than 150 points: append a new point.
+        }
+      }
+    };
+    xhttp.open("GET", "/pressure", true);
+    xhttp.send();
+  }, 1000 ) ;
+
+  // To update the temperature on the background, we have a setInterval() function that runs every 1 seconds : 
+  setInterval(function ( ) {
+    var xhttp = new XMLHttpRequest();              // Create a new XMLHttpRequest object.
+    xhttp.onreadystatechange = function() {        // onreadystatechange property defines a function to be executed when the readyState property changes.
+
+    /* The response of the request is ready when the readyState is 4, and the status is 200 ...
+        readyState = 4 means that the request finished and the response is ready and the status = 200 means “OK” */
+      if (this.readyState == 4 && this.status == 200) {
+        // When it receives that value, it updates the HTML element whose id is temperature :
+        document.getElementById("temperature").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/temperature", true);    // We makes a GET request in the /temperature URL to get the latest temperature reading.
+    xhttp.send();
+  }, 1000 ) ;
+
+  setInterval(function ( ) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("humidity").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/humidity", true);
+    xhttp.send();
+  }, 1000 ) ;
+
+  setInterval(function ( ) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("pressure").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/pressure", true);
+    xhttp.send();
+  }, 1000 ) ;
+
+  Highcharts.setOptions({
+    time: {
+      timezoneOffset: -60 //Adding our time zone offset in minutes
+    }
+  });
+
+  </script>
+  
+</html>
