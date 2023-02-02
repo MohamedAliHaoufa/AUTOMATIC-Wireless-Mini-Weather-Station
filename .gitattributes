@@ -1,5 +1,5 @@
 docs/* linguist-documentation
 src/*.ino linguist-language=c
-src/*.html linguist-language=javascript html css
+src/*.html linguist-language=javascript
 *.ino linguist-detectable=true
 
